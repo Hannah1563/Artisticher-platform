@@ -1,130 +1,39 @@
-// ===============================
-// ArtisticHer Frontend API File
-// ===============================
+import axios from 'axios';
 
-const API_URL = "http://localhost:5001/api";
+const API_BASE_URL = 'http://localhost:5001'; // This must match your backend port
 
-//
-// -----------------------
-// USER AUTHENTICATION
-// -----------------------
-//
+export const register = (payload) =>
+  axios.post(`${API_BASE_URL}/api/auth/register`, payload);
 
-// Register User
-export const registerUser = async (data) => {
-  const res = await fetch(`${API_URL}/users/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const login = (payload) =>
+  axios.post(`${API_BASE_URL}/api/auth/login`, payload);
+
+export const getArtists = () =>
+  axios.get(`${API_BASE_URL}/api/users/artists`);
+
+export const getAllArtworks = () =>
+  axios.get(`${API_BASE_URL}/api/artworks`);
+
+export const getAllEvents = () =>
+  axios.get(`${API_BASE_URL}/api/events`);
+
+export const getEventById = (eventId) =>
+  axios.get(`${API_BASE_URL}/api/events/${eventId}`);
+
+export const createArtwork = (payload, token) =>
+  axios.post(`${API_BASE_URL}/api/artworks`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
-};
 
-// Login User
-export const loginUser = async (data) => {
-  const res = await fetch(`${API_URL}/users/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const createOrder = (payload, token) =>
+  axios.post(`${API_BASE_URL}/api/orders`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
-};
 
-//
-// -----------------------
-// ARTISTS (NEW SECTION)
-// -----------------------
-//
-
-// Fetch all artists
-export const fetchArtists = async () => {
-  try {
-    const response = await fetch(`${API_URL}/users/artists`);
-    if (!response.ok) throw new Error("Failed to fetch artists");
-    return await response.json();
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-//
-// -----------------------
-// ARTWORKS
-// -----------------------
-//
-
-// Fetch all artworks
-export const fetchArtworks = async () => {
-  const res = await fetch(`${API_URL}/artworks`);
-  return res.json();
-};
-
-// Add new artwork (formData because it may contain images)
-export const addArtwork = async (formData) => {
-  const res = await fetch(`${API_URL}/artworks`, {
-    method: "POST",
-    body: formData,
+export const getUserOrders = (token) =>
+  axios.get(`${API_BASE_URL}/api/orders/my`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
-};
 
-// Delete artwork
-export const deleteArtwork = async (id) => {
-  const res = await fetch(`${API_URL}/artworks/${id}`, {
-    method: "DELETE",
-  });
-  return res.json();
-};
+// filepath: /Users/jeanbaptistetuyishimire/Artisticher-platform/backend/server.js
 
-//
-// -----------------------
-// EVENTS
-// -----------------------
-//
-
-// Fetch list of events
-export const fetchEvents = async () => {
-  const res = await fetch(`${API_URL}/events`);
-  return res.json();
-};
-
-// Join an event
-export const joinEvent = async (eventId, artistId) => {
-  const res = await fetch(`${API_URL}/events/${eventId}/join`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ artist_id: artistId }),
-  });
-  return res.json();
-};
-
-//
-// -----------------------
-// ENGAGEMENT (Likes, Views…)
-// -----------------------
-//
-
-// Like an artwork
-export const likeArtwork = async (artworkId) => {
-  const res = await fetch(`${API_URL}/engagement/${artworkId}/like`, {
-    method: "POST",
-  });
-  return res.json();
-};
-
-//
-// -----------------------
-// SALES / TRANSACTIONS
-// -----------------------
-//
-
-// Create a sale (buyer buys an artwork)
-export const createSale = async (saleData) => {
-  const res = await fetch(`${API_URL}/sales`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(saleData),
-  });
-  return res.json();
-};

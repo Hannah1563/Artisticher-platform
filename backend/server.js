@@ -1,13 +1,13 @@
 const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
-
+const cors = require("cors"); // <-- ADD THIS LINE
 const app = express();
 const db = require('./config/db');
 
+// Enable CORS for all routes
+app.use(cors()); // <-- ADD THIS LINE
+
 // Middleware
-app.use(cors());
-app.use(express.json());               // <-- IMPORTANT
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Simple logger

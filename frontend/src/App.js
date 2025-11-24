@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Components
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
+
+// Pages
 import Home from './pages/Home';
+import Marketplace from './pages/Marketplace';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Artists from './pages/Artists';
+import ArtistDashboard from './pages/ArtistDashboard';
 import ArtistProfile from './pages/ArtistProfile';
-import Gallery from './pages/Gallery';
-import AddArtwork from './pages/AddArtwork';
-import Events from './pages/Events';
+import Artists from './pages/Artists';
 import ArtworkDetail from './pages/ArtworkDetail';
+import ArtworkList from './pages/ArtworkList';
+import AddArtwork from './pages/AddArtwork';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
+import Order from './pages/Order';
+import Orders from './pages/Orders';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
-import ArtistDashboard from './pages/ArtistDashboard';
+import Events from './pages/Events';
+import EventList from './pages/EventList';
+import EventDetail from './pages/EventDetail';
+import Gallery from './pages/Gallery';
+import PaymentCallback from './pages/PaymentCallback';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -70,10 +81,7 @@ function App() {
     }
   };
 
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem('cart');
-  };
+  const clearCart = () => setCart([]);
 
   return (
     <Router>
@@ -81,21 +89,44 @@ function App() {
         <Navigation user={user} setUser={setUser} cartCount={cart.length} />
         <main className="flex-grow">
           <Routes>
+            {/* Public pages */}
             <Route path="/" element={<Home />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/gallery" element={<Gallery />} />
+
+            {/* Auth */}
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
+
+            {/* Artists & artworks */}
             <Route path="/artists" element={<Artists />} />
             <Route path="/artists/:id" element={<ArtistProfile />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/artwork/:id" element={<ArtworkDetail addToCart={addToCart} user={user} />} />
+            <Route path="/artworks" element={<ArtworkList />} />
+            <Route path="/artworks/:id" element={<ArtworkDetail addToCart={addToCart} user={user} />} />
+            <Route path="/dashboard" element={<ArtistDashboard user={user} />} />
             <Route path="/add-artwork" element={<AddArtwork user={user} />} />
-            <Route path="/events" element={<Events />} />
+
+            {/* Cart / orders / checkout */}
             <Route path="/cart" element={<Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
-            <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} user={user} />} />
+            <Route
+              path="/checkout"
+              element={<Checkout cart={cart} user={user} clearCart={clearCart} />}
+            />
             <Route path="/my-orders" element={<MyOrders user={user} />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:id" element={<Order />} />
+
+            {/* Courses */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:id" element={<CourseDetail user={user} />} />
-            <Route path="/dashboard" element={<ArtistDashboard user={user} />} />
+
+            {/* Events */}
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/list" element={<EventList />} />
+            <Route path="/events/:id" element={<EventDetail />} />
+
+            {/* Payments */}
+            <Route path="/payment/callback" element={<PaymentCallback />} />
           </Routes>
         </main>
         <Footer />

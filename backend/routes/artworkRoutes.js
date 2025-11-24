@@ -2,24 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/authMiddleware');
+const artworkController = require('../controllers/artworkController');
 
 // GET /api/artworks - list all artworks
-router.get('/', async (req, res) => {
-  try {
-    const result = await db.query(`
-      SELECT a.*, u.username AS artist_name
-      FROM artworks a
-      LEFT JOIN users u ON a.user_id = u.id
-      ORDER BY a.created_at DESC
-    `);
-
-    // Return array directly so frontend can do artworks.map / filter
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching artworks:', err);
-    res.status(500).json({ error: 'Failed to fetch artworks' });
-  }
-});
+router.get('/', artworkController.getAllArtworks);
 
 // POST /api/artworks - create artwork (artist only)
 router.post('/', authMiddleware, async (req, res) => {

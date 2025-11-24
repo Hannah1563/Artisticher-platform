@@ -1,0 +1,193 @@
+.checkout-container {
+  min-height: calc(100vh - 70px);
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.checkout-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-card h2 {
+  color: #a855f7;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.artwork-summary {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.artwork-summary img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.artwork-details h3 {
+  color: #1f2937;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.artwork-details .artist {
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.artwork-details .price {
+  color: #a855f7;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* QR Container */
+.qr-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.qr-container h2 {
+  color: #a855f7;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.qr-artwork-info {
+  margin-bottom: 2rem;
+}
+
+.qr-artwork-info img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.qr-artwork-info h3 {
+  color: #1f2937;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.qr-code {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+}
+
+.qr-code canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+.payment-instructions {
+  text-align: left;
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.payment-instructions h4 {
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.payment-instructions ol {
+  padding-left: 1.5rem;
+}
+
+.payment-instructions li {
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.qr-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.order-summary {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  color: #6b7280;
+}
+
+.summary-row.total {
+  border-top: 2px solid #e5e7eb;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.btn-secondary {
+  background: white;
+  color: #a855f7;
+  border: 2px solid #a855f7;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #a855f7;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .checkout-card {
+    padding: 2rem;
+  }
+
+  .artwork-summary {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .artwork-summary img {
+    width: 100%;
+    height: 200px;
+  }
+
+  .qr-actions {
+    flex-direction: column;
+  }
+}

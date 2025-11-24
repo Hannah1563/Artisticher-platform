@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addArtwork } from '../api';
+import { createArtwork } from '../api';
+import './Auth.css';
 
 function AddArtwork() {
   const navigate = useNavigate();
@@ -8,7 +9,8 @@ function AddArtwork() {
     title: '',
     description: '',
     price: '',
-    image_url: ''
+    image_url: '',
+    category: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,6 +29,7 @@ function AddArtwork() {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -34,110 +37,122 @@ function AddArtwork() {
     setError('');
     setLoading(true);
 
-    const user_id = localStorage.getItem('userId');
-
-    const artworkData = new FormData();
-    artworkData.append('title', formData.title);
-    artworkData.append('description', formData.description);
-    artworkData.append('price', formData.price);
-    artworkData.append('image_url', formData.image_url);
-    artworkData.append('user_id', user_id);
-
     try {
-      await addArtwork(artworkData);
-      alert('Artwork added successfully!');
-      navigate('/gallery');
+      const payload = {
+        ...formData,
+        price: Number(formData.price),
+      };
+
+      // We don't use the response, so no need to assign it
+      await createArtwork(payload);
+
+      navigate('/artworks');
     } catch (err) {
-      console.error(err);
-      setError('Failed to add artwork');
+      console.error('Add artwork error:', err);
+      setError(
+        err?.error ||
+        err?.message ||
+        'Failed to add artwork. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
-      <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-6">Add Your Artwork</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>Add New Artwork</h2>
+          <p>Share your art with the community</p>
+        </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Title</label>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="title">Title *</label>
             <input
-              type="text"
+              id="title"
               name="title"
-              required
+              type="text"
               value={formData.title}
               onChange={handleChange}
+              required
+              placeholder="Artwork title"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+          <div className="form-group">
+            <label htmlFor="description">Description *</label>
             <textarea
+              id="description"
               name="description"
-              rows="4"
               value={formData.description}
               onChange={handleChange}
+              required
+              placeholder="Describe your artwork"
+              style={{
+                minHeight: '100px',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '1px solid #e5e7eb',
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Price (USD)</label>
+          <div className="form-group">
+            <label htmlFor="price">Price (USD) *</label>
             <input
-              type="number"
+              id="price"
               name="price"
+              type="number"
+              min="0"
+              step="0.01"
               value={formData.price}
               onChange={handleChange}
-              step="0.01"
-              min="0"
+              required
+              placeholder="100.00"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="0.00"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Image URL</label>
+          <div className="form-group">
+            <label htmlFor="image_url">Image URL *</label>
             <input
-              type="url"
+              id="image_url"
               name="image_url"
-              required
+              type="url"
               value={formData.image_url}
               onChange={handleChange}
+              required
+              placeholder="https://example.com/your-artwork.jpg"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="https://example.com/image.jpg"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Paste an image URL for now. File upload coming soon.
-            </p>
           </div>
 
-          {formData.image_url && (
-            <div>
-              <label className="block text-sm font-medium mb-1">Preview</label>
-              <img 
-                src={formData.image_url} 
-                alt="Preview"
-                className="w-full h-64 object-cover rounded-md"
-                onError={(e) => e.target.style.display = 'none'}
-              />
-            </div>
-          )}
+          <div className="form-group">
+            <label htmlFor="category">Category *</label>
+            <input
+              id="category"
+              name="category"
+              type="text"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              placeholder="painting, sculpture, digital, etc."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 text-white py-3 rounded-md font-semibold hover:bg-purple-700 disabled:opacity-50"
+            className={`submit-button ${loading ? 'loading' : ''} w-full bg-purple-600 text-white py-3 rounded-md font-semibold hover:bg-purple-700 disabled:opacity-50`}
           >
-            {loading ? 'Adding Artwork...' : 'Add Artwork'}
+            {loading ? 'Adding...' : 'Add Artwork'}
           </button>
         </form>
       </div>

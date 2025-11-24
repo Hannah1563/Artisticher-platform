@@ -1,25 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db');
-const authMiddleware = require('../middleware/authMiddleware');
+const userController = require('../controllers/userController'); // ✅ ADD / ENSURE THIS LINE
 
 // GET /api/users/artists - list all artists
-router.get('/artists', async (req, res) => {
-  try {
-    const result = await db.query(
-      `SELECT id, username, email, bio, profile_image, role, location
-       FROM users
-       WHERE role = 'artist'
-       ORDER BY created_at DESC`
-    );
-
-    // Return array directly so frontend can do artists.map(...)
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching artists:', err);
-    res.status(500).json({ error: 'Failed to fetch artists' });
-  }
-});
+router.get('/artists', userController.getArtists);
 
 // GET /api/users/:id - single user
 router.get('/:id', async (req, res) => {

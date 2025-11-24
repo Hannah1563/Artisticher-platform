@@ -1,0 +1,126 @@
+.orders-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.orders-container h1 {
+  margin-bottom: 2rem;
+  color: #1f2937;
+  font-size: 2.5rem;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.no-orders p {
+  font-size: 1.2rem;
+  color: #6b7280;
+  margin: 1rem 0;
+}
+
+.orders-list {
+  display: grid;
+  gap: 2rem;
+}
+
+.order-card {
+  display: flex;
+  gap: 2rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.order-card img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.order-info {
+  flex: 1;
+}
+
+.order-info h3 {
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+.order-info .artist {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.order-info .price {
+  color: #a855f7;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.order-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.payment-method {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .order-card {
+    flex-direction: column;
+  }
+
+  .order-card img {
+    width: 100%;
+    height: 200px;
+  }
+}

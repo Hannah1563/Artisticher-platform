@@ -1,15 +1,28 @@
 const db = require('../config/db');
 
-// Get all events
+// GET /api/events
 exports.getAllEvents = async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT * FROM events ORDER BY event_date DESC'
+      `SELECT 
+         id,
+         title,
+         description,
+         event_date,   -- use the actual column name
+         location,
+         image_url
+       FROM events
+       ORDER BY event_date DESC`
     );
-    res.json({ events: result.rows });
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    res.status(500).json({ error: 'Failed to fetch events' });
+    const events = result.rows || [];
+
+    res.json({
+      success: true,
+      events,
+    });
+  } catch (err) {
+    console.error('❌ Error fetching events:', err);
+    res.status(500).json({ success: false, error: 'Failed to load events' });
   }
 };
 

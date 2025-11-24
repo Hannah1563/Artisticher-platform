@@ -1,72 +1,68 @@
 // src/pages/Artists.js
-import React, { useState, useEffect } from 'react';
-import ArtistCard from '../components/ArtistCard';
+import React, { useEffect, useState } from 'react';
+import { getArtists } from '../api';
 
-function Artists() {
-  const [artists, setArtists] = useState([]);
+const Artists = () => {
+  const [artists, setArtists] = useState([]);    // always array
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
+    const loadArtists = async () => {
+      try {
+        const res = await getArtists();
+        const data = res.data || res;
+
+        // Normalize various shapes to a single array
+        let list = [];
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (Array.isArray(data.artists)) {
+          list = data.artists;
+        } else if (Array.isArray(data.data)) {
+          list = data.data;
+        }
+
+        setArtists(list);
+      } catch (err) {
+        console.error('Error loading artists:', err);
+        setArtists([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadArtists();
   }, []);
 
-  const loadArtists = async () => {
-    try {
-      const response = await fetch('http://localhost:5001/api/users/artists');
-      const data = await response.json();
-
-      if (response.ok) {
-        setArtists(data);
-      } else {
-        setError('Failed to load artists');
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-      console.error('Error loading artists:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl text-gray-600">Loading artists...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600 text-xl">{error}</div>
-      </div>
-    );
+    return <div>Loading artists...</div>;
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Discover Talented Artists</h1>
-        <p className="text-xl text-gray-600">
-          Browse through {artists.length} amazing artists from around the world
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-2">Discover Talented Artists</h1>
+      <p className="mb-6 text-gray-600">
+        Browse through {artists.length} amazing artists from around the world
+      </p>
 
       {artists.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-600 text-lg">No artists found.</p>
-        </div>
+        <div>No artists found.</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {artists.map((artist) => (
-            <ArtistCard key={artist.id} artist={artist} />
+            <div key={artist.id} className="bg-white rounded shadow p-4">
+              <h2 className="font-semibold text-lg mb-1">
+                {artist.username || artist.name}
+              </h2>
+              <p className="text-sm text-gray-600">
+                {artist.bio || 'No bio available.'}
+              </p>
+            </div>
           ))}
         </div>
       )}
     </div>
   );
-}
+};
 
 export default Artists;

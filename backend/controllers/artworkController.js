@@ -3,16 +3,25 @@ const db = require('../config/db');
 // Get all artworks
 exports.getAllArtworks = async (req, res) => {
   try {
-    const result = await db.query(`
-      SELECT a.*, u.username as artist_name
-      FROM artworks a
-      LEFT JOIN users u ON a.user_id = u.id
-      ORDER BY a.created_at DESC
-    `);
-    res.json({ artworks: result.rows });
-  } catch (error) {
-    console.error('Error fetching artworks:', error);
-    res.status(500).json({ error: 'Failed to fetch artworks' });
+    const result = await db.query(
+      `SELECT
+         id,
+         title,
+         description,
+         image_url,
+         price,
+         user_id,        -- replace artist_id with your real FK column
+         created_at
+       FROM artworks
+       ORDER BY created_at DESC`
+    );
+
+    const artworks = result.rows || [];
+
+    res.json({ success: true, artworks });
+  } catch (err) {
+    console.error('❌ Error fetching artworks:', err);
+    res.status(500).json({ success: false, error: 'Failed to load artworks' });
   }
 };
 

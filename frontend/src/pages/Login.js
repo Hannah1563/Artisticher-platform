@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../api';
+import './Auth.css';
+import { useLocation } from 'react-router-dom';
 
-function Login({ setUser }) {
+const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    email: '',
+    password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message || '';
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -23,108 +29,84 @@ function Login({ setUser }) {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      const res = await login(formData);   // POST /auth/login
+      const data = res.data || res;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store token and user info
+      if (data.success && data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.user.username);
-        localStorage.setItem('userId', data.user.id);
-        
-        // Update user state
-        setUser({
-          username: data.user.username,
-          userId: data.user.id
-        });
-
-        // Redirect to home
+        localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/');
+        window.location.reload();
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.error || 'Login failed');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
       console.error('Login error:', err);
+      // If api.js response interceptor does `Promise.reject(error.response.data)`
+      const msg = err?.error || err?.message || 'Login failed';
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Login to your account</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
+        {error && <div className="error-message">{error}</div>}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                placeholder="Enter your username"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                placeholder="Enter your password"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50"
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-purple-600 hover:text-purple-700 font-semibold">
-                Register here
-              </Link>
-            </p>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="email">Email *</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="your.email@example.com"
+              autoComplete="email"
+            />
           </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password *</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`submit-button ${loading ? 'loading' : ''}`}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          <p>
+            Don't have an account? <Link to="/register">Register here</Link>
+          </p>
         </div>
       </div>
+      {successMessage && <div className="success-message">{successMessage}</div>}
     </div>
   );
-}
+};
 
 export default Login;

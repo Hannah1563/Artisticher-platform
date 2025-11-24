@@ -4,12 +4,18 @@ const db = require('../config/db');
 exports.getArtists = async (req, res) => {
   try {
     const result = await db.query(
-      "SELECT id, username, email, role, profile_image, bio FROM users WHERE role = 'artist'"
+      'SELECT id, username, email, role, bio, avatar_url FROM users WHERE role = $1',
+      ['artist']
     );
-    res.json({ artists: result.rows });
-  } catch (error) {
-    console.error('Error fetching artists:', error);
-    res.status(500).json({ error: 'Failed to fetch artists' });
+    const artists = result.rows || [];
+
+    res.json({
+      success: true,
+      artists,
+    });
+  } catch (err) {
+    console.error('❌ Error fetching artists:', err);
+    res.status(500).json({ success: false, error: 'Failed to load artists' });
   }
 };
 
