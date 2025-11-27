@@ -8,54 +8,47 @@ function AddArtwork() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    image: null,
     price: '',
-    image_url: '',
-    category: ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // You can use this if you want loading state
 
   // 🔒 Protect page - only logged in users can access
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
+    const userData = localStorage.getItem('user');
+    if (!userData) {
       alert('Please login to add artworks');
       navigate('/login');
     }
   }, [navigate]);
 
   const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: type === 'file' ? files[0] : value
     });
     setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    const token = localStorage.getItem('token');
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('description', formData.description);
+    data.append('price', formData.price); // <-- Make sure this is included!
+    data.append('image', formData.image);
 
     try {
-      const payload = {
-        ...formData,
-        price: Number(formData.price),
-      };
-
-      // We don't use the response, so no need to assign it
-      await createArtwork(payload);
-
-      navigate('/artworks');
-    } catch (err) {
-      console.error('Add artwork error:', err);
-      setError(
-        err?.error ||
-        err?.message ||
-        'Failed to add artwork. Please try again.'
-      );
-    } finally {
+      await createArtwork(data, token);
       setLoading(false);
+      navigate('/gallery'); // Redirect to gallery or show a success message
+    } catch (err) {
+      setError('Failed to add artwork.');
+      setLoading(false);
+      console.error('Artwork upload error:', err?.response?.data || err.message);
     }
   };
 
@@ -69,7 +62,7 @@ function AddArtwork() {
 
         {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" encType="multipart/form-data">
           <div className="form-group">
             <label htmlFor="title">Title *</label>
             <input
@@ -104,46 +97,29 @@ function AddArtwork() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="price">Price (USD) *</label>
+            <label htmlFor="image">Image *</label>
+            <input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="price">Price (RWF) *</label>
             <input
               id="price"
               name="price"
               type="number"
-              min="0"
-              step="0.01"
-              value={formData.price}
+              value={formData.price || ''}
               onChange={handleChange}
               required
-              placeholder="100.00"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="image_url">Image URL *</label>
-            <input
-              id="image_url"
-              name="image_url"
-              type="url"
-              value={formData.image_url}
-              onChange={handleChange}
-              required
-              placeholder="https://example.com/your-artwork.jpg"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category">Category *</label>
-            <input
-              id="category"
-              name="category"
-              type="text"
-              value={formData.category}
-              onChange={handleChange}
-              required
-              placeholder="painting, sculpture, digital, etc."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Enter price in RWF"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
 

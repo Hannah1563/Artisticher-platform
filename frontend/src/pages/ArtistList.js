@@ -1,63 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchArtists } from '../api';
-import './ArtistList.css';
+import React, { useEffect, useState } from 'react';
+import { getArtists } from '../api';
 
-const ArtistList = () => {
+function ArtistList() {
   const [artists, setArtists] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    const loadArtists = async () => {
+    async function fetchArtists() {
       try {
-        const data = await fetchArtists();
-        setArtists(data.artists || data);
+        const res = await getArtists();
+        // If your backend returns an array directly:
+        setArtists(Array.isArray(res.data) ? res.data : []);
+        // If your backend returns { artists: [...] }:
+        // setArtists(Array.isArray(res.data.artists) ? res.data.artists : []);
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setArtists([]);
       }
-    };
-
-    loadArtists();
+    }
+    fetchArtists();
   }, []);
 
-  if (loading) return <div className="loading">Loading artists...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const safeArtists = Array.isArray(artists) ? artists : [];
 
   return (
-    <div className="artist-list-container">
-      <h1>Featured Artists</h1>
-      
-      {artists.length === 0 ? (
-        <div className="no-artists">
-          <p>No artists available at the moment</p>
+    <div>
+      {safeArtists.map(artist => (
+        <div key={artist.id}>
+          {artist.username}
+          {/* Render artworks if available */}
+          {Array.isArray(artist.artworks) && artist.artworks.length > 0 && (
+            <div>
+              {artist.artworks.map(artwork => (
+                <div key={artwork.id}>
+                  <div>{artwork.title}</div>
+                  {artwork.image_url && (
+                    <img
+                      src={`http://localhost:5001${artwork.image_url}`}
+                      alt={artwork.title}
+                      style={{ width: 200, height: 'auto' }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="artist-grid">
-          {artists.map(artist => (
-            <Link to={`/artists/${artist.id}`} key={artist.id} className="artist-card">
-              <div className="artist-avatar">
-                {artist.profile_image ? (
-                  <img src={artist.profile_image} alt={artist.username} />
-                ) : (
-                  <div className="avatar-placeholder">
-                    {artist.username?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <div className="artist-info">
-                <h3>{artist.username}</h3>
-                <p className="artist-email">✉️ {artist.email}</p>
-                {artist.bio && <p className="artist-bio">{artist.bio}</p>}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      ))}
     </div>
   );
-};
+}
 
 export default ArtistList;

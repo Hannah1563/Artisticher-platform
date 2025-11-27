@@ -1,76 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Navbar.css';
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setIsLoggedIn(true);
-      try {
-        setUser(JSON.parse(userData));
-      } catch (e) {
-        console.error('Failed to parse user data');
-      }
-    }
+    const storedUser = localStorage.getItem('user');
+    setUser(storedUser ? JSON.parse(storedUser) : null);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    localStorage.removeItem('cart');
-    setIsLoggedIn(false);
     setUser(null);
-    navigate('/login');
+    navigate('/');
+    window.location.reload();
   };
 
   return (
     <nav className="navbar">
-      <div className="nav-brand">
-        <Link to="/">🎨 Artisticher</Link>
+      <div className="navbar-left">
+        <Link to="/" className="logo">🎨 Artisticher</Link>
+        <Link to="/artists">Artists</Link>
+        <Link to="/gallery">Gallery</Link>
+        <Link to="/learn">Learn Art</Link>
+        <Link to="/events">Events</Link>
+        <span role="img" aria-label="cart">🛒</span>
       </div>
-
-      <div className="nav-links">
-        <Link to="/">Home</Link>
-        {isLoggedIn ? (
-          <>
-            <Link to="/artists">Artists</Link>
-            <Link to="/artworks">Gallery</Link>
-            <Link to="/events">Events</Link>
-            {user?.role === 'artist' && (
-              <Link to="/artworks/add" className="btn-add-artwork">+ Add Artwork</Link>
-            )}
-            <Link to="/cart">🛒 Cart</Link>
-            <Link to="/orders">My Orders</Link>
-            <span className="user-name">👤 {user?.username}</span>
-            <button onClick={handleLogout} className="btn-logout">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="btn-login">Login</Link>
-            <Link to="/register" className="btn-register">Register</Link>
-          </>
-        )}
-      </div>
-
-      <div className="nav-auth">
+      <div className="navbar-right">
+        <span role="img" aria-label="flag">🇬🇧</span> English
         {user ? (
           <>
-            <span className="mr-2">Hi, {user.username}</span>
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
+            <span className="ml-4 font-semibold">Hi, {user.username}</span>
+            <button onClick={handleLogout} className="ml-4">Logout</button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link to="/login" className="ml-4">Login</Link>
+            <Link to="/register" className="ml-2">Register</Link>
           </>
         )}
       </div>

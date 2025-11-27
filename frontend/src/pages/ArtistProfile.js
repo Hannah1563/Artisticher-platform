@@ -6,6 +6,12 @@ function ArtistProfile() {
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Add these states for editing bio
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioInput, setBioInput] = useState('');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isOwnProfile = user && String(user._id) === String(id); // Ensure both are strings
+
   useEffect(() => {
     const loadArtistData = async () => {
       try {
@@ -13,6 +19,7 @@ function ArtistProfile() {
         const response = await fetch(`http://localhost:5001/api/users/${id}`);
         const data = await response.json();
         setArtist(data);
+        setBioInput(data.bio || '');
       } catch (error) {
         console.error('Error loading artist:', error);
       } finally {
@@ -21,7 +28,29 @@ function ArtistProfile() {
     };
 
     loadArtistData();
-  }, [id]); // Now ESLint is happy - only 'id' in dependencies
+  }, [id]);
+
+  const handleSaveBio = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5001/api/users/${id}/bio`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify({ bio: bioInput }),
+      });
+      if (res.ok) {
+        setArtist(prev => ({ ...prev, bio: bioInput }));
+        setEditingBio(false);
+      } else {
+        alert('Failed to update bio.');
+      }
+    } catch {
+      alert('Failed to update bio.');
+    }
+  };
 
   if (loading) {
     return (
@@ -52,7 +81,46 @@ function ArtistProfile() {
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-2">{artist.username}</h1>
             <p className="text-gray-600 mb-4">{artist.email}</p>
-            <p className="text-gray-700 mb-4">{artist.bio || 'No bio available'}</p>
+            {/* Bio Section */}
+            {!editingBio ? (
+              <>
+                <p className="text-gray-700 mb-4">{artist.bio || 'No bio available'}</p>
+                {isOwnProfile && (
+                  <button
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                    onClick={() => setEditingBio(true)}
+                  >
+                    Edit Bio
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="mb-4">
+                <textarea
+                  value={bioInput}
+                  onChange={e => setBioInput(e.target.value)}
+                  className="w-full min-h-[100px] p-2 border border-purple-400 rounded mb-2"
+                  placeholder="Write something about yourself..."
+                />
+                <div className="flex gap-2">
+                  <button
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                    onClick={handleSaveBio}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
+                    onClick={() => {
+                      setEditingBio(false);
+                      setBioInput(artist.bio || '');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="flex gap-4 text-sm text-gray-600">
               <span>📅 Joined: {new Date(artist.created_at).toLocaleDateString()}</span>
               <span>🎨 Artworks: {artist.artworks?.length || 0}</span>
