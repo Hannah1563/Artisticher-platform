@@ -1,11 +1,19 @@
-const express = require("express");
-const cors = require("cors"); // <-- ADD THIS LINE
-const app = express();
-const db = require('./config/db');
-const path = require('path');
+require('dotenv').config();
 
-// Enable CORS for all routes
-app.use(cors()); // <-- ADD THIS LINE
+const express = require("express");
+const cors = require("cors");
+const path = require('path');
+const db = require('./config/db');
+
+const app = express();
+
+// CORS configuration
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true,
+}));
 
 // Middleware
 app.use(express.json());
@@ -16,6 +24,9 @@ app.use((req, res, next) => {
   console.log(req.method, req.path);
   next();
 });
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // DB test
 db.query('SELECT NOW()', (err) => {
@@ -41,9 +52,7 @@ app.use('/api/payments', paymentRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

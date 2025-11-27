@@ -52,36 +52,31 @@ exports.getArtworkById = async (req, res) => {
 // Create artwork (artists only)
 exports.createArtwork = async (req, res) => {
   try {
-    const { title, description, price } = req.body;
-    const userId = req.user.id;
-
-    if (req.user.role !== 'artist') {
-      return res.status(403).json({ error: 'Only artists can add artworks.' });
+    const userId = req.user && req.user.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: no user id' });
     }
 
-    // Validate required fields
-    if (!title || !description || !price || !req.file) {
-      return res.status(400).json({ error: 'All fields are required.' });
+    const { title, description, price, category } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (!title || !price || !imageUrl) {
+      return res.status(400).json({ success: false, message: 'title, price, and image are required' });
     }
 
-    // Parse and validate price
-    if (isNaN(price) || Number(price) <= 0) {
-      return res.status(400).json({ error: 'Price must be a positive number.' });
-    }
+    const query = `
+      INSERT INTO artworks (user_id, title, description, price, image_url, category)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
+    `;
+    const values = [userId, title, description || null, price, imageUrl, category || null];
 
-    const image_url = `/uploads/${req.file.filename}`;
+    const result = await db.query(query, values);
 
-    const result = await db.query(
-      `INSERT INTO artworks (title, description, image_url, price, user_id, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
-       RETURNING id, title, description, image_url, price, user_id, created_at`,
-      [title, description, image_url, price, userId]
-    );
-
-    res.status(201).json({ success: true, artwork: result.rows[0] });
+    return res.status(201).json({ success: true, artwork: result.rows[0] });
   } catch (err) {
-    console.error('❌ Error creating artwork:', err);
-    res.status(500).json({ success: false, error: 'Failed to create artwork' });
+    console.error('Error creating artwork:', err);
+    return res.status(500).json({ success: false, error: 'Error creating artwork' });
   }
 };
 

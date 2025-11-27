@@ -1,29 +1,26 @@
 const jwt = require('jsonwebtoken');
 
-const auth = async (req, res, next) => {
+module.exports = function (req, res, next) {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
   try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
-    }
-
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    console.log('Decoded token in auth middleware:', decoded); // DEBUG
+
+    // NOTE: token has userId, not id
+    req.user = {
+      id: decoded.userId,      // <--- change here
+      email: decoded.email || null,
+      role: decoded.role || null,
+    };
     next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    return res.status(401).json({ success: false, message: 'Invalid token' });
   }
 };
-
-const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Access denied. Admin only.' });
-  }
-};
-
-module.exports = { auth, isAdmin };
