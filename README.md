@@ -412,6 +412,12 @@ Contributions are welcome! Please follow these steps:
 For questions or support:
 - Email: htuyishimireishimwe@gmail.com
 - GitHub: [@Hannah1563](https://github.com/Hannah1563)
+- Link to SRS document:  https://docs.google.com/document/d/11bplQ1yX-yMF53ovS_Y2YIE80bhr2AUmG7CfS6xPZmk/edit?usp=sharing
+- Link to demo video: https://youtu.be/Vudj1vLWHVY?si=gWJtIOJwb7iX_Uvu
+- link to live serers:
+                      artisticher-backend:   https://artisticher-backend.onrender.com
+                      artisticher-frontend:   https://artisticher-frontend.onrender.com
+  [![Watch the video](https://img.youtube.com/vi/Vudj1vLWHVY/0.jpg)](https://www.youtube.com/watch?v=Vudj1vLWHVY)
 
 ---
 
