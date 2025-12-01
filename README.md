@@ -416,8 +416,8 @@ For questions or support:
 - Link to demo video: https://youtu.be/Vudj1vLWHVY?si=gWJtIOJwb7iX_Uvu
 - link to live serers:
                       artisticher-backend:   https://artisticher-backend.onrender.com
-                      artisticher-frontend:   https://artisticher-frontend.onrender.com
-  [![Watch the video](https://img.youtube.com/vi/Vudj1vLWHVY/0.jpg)](https://www.youtube.com/watch?v=Vudj1vLWHVY)
+                      artisticher-frontend:(https://artisticher-platform-ww1l.vercel.app/)
+ Link to demo video on youtube: [![Watch the video](https://img.youtube.com/vi/Vudj1vLWHVY/0.jpg)](https://www.youtube.com/watch?v=Vudj1vLWHVY)
 
 ---
 
